@@ -1,0 +1,37 @@
+{
+    "name": "libuv-fs",
+
+    "author": "Bodo Kaiser <i@bodokaiser.io>",
+
+    "license": "BSD",
+
+    "version": "0.0.0",
+
+    "keywords": ["libuv", "fs"],
+
+    "description": "rebuilt example of libuv fs bindings",
+
+    "readmeFilename": "README.md",
+
+    "gypfile": true,
+
+    "bugs": {
+        "url": "https://github.com/bodokaiser/node-libuv-fs/issues"
+    },
+
+    "scripts": {
+        "test": "make test",
+        "install": "make install"
+    },
+
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/bodokaiser/node-libuv-fs"
+    },
+
+    "dependencies": {
+        "node-gyp": "0.10.0",
+        "mocha": "1.11.0",
+        "chai": "1.6.1"
+    }
+}
