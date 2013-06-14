@@ -2,7 +2,7 @@
     "targets": [
         {
             "target_name": "fs",
-            "sources": ["src/fs.cc"]
+            "sources": ["deps/uv.h", "src/fs.cc"]
         }
     ]
 }
