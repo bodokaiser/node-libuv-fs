@@ -7,6 +7,7 @@ using namespace v8;
 
 using node::Buffer;
 using node::UVException;
+using node::MakeCallback;
 
 void
 Initialize(Handle<Object> exports) {
@@ -18,7 +19,7 @@ Initialize(Handle<Object> exports) {
             FunctionTemplate::New(Close)->GetFunction());
 }
 
-Handle<Value>
+static Handle<Value>
 Open(const Arguments &args) {
     HandleScope scope;
 
@@ -33,12 +34,15 @@ Open(const Arguments &args) {
     int flags = args[1]->Int32Value();
     int mode = static_cast<int>(args[2]->Int32Value());
 
-    FS_SYNC_CALL(open, * path, * path, flags, mode);
+    if (args[3]->IsFunction()) {
 
-    return scope.Close(Integer::New(FS_SYNC_RESULT));
+    } else {
+        FS_SYNC_CALL(open, * path, * path, flags, mode);
+        return scope.Close(Integer::New(FS_SYNC_RESULT));
+    }
 }
 
-Handle<Value>
+static Handle<Value>
 Read(const Arguments &args) {
     HandleScope scope;
 
@@ -67,12 +71,15 @@ Read(const Arguments &args) {
     if (off + len > buf_len)
         return THROW_ERROR("Length is out of buffer range.");
 
-    FS_SYNC_CALL(read, 0, fd, buf_data + off, len, pos);
+    if (args[5]->IsFunction()) {
 
-    return scope.Close(Integer::New(FS_SYNC_RESULT));
+    } else {
+        FS_SYNC_CALL(read, 0, fd, buf_data + off, len, pos);
+        return scope.Close(Integer::New(FS_SYNC_RESULT));
+    }
 }
 
-Handle<Value>
+static Handle<Value>
 Close(const Arguments &args) {
     HandleScope scope;
 
@@ -81,9 +88,46 @@ Close(const Arguments &args) {
 
     int fd = args[0]->NumberValue();
 
-    FS_SYNC_CALL(close, 0, fd);
+    if (args[1]->IsFunction()) {
 
-    return scope.Close(Undefined());
+    } else {
+        FS_SYNC_CALL(close, 0, fd);
+        return scope.Close(Undefined());
+    }
+}
+
+static void
+After(uv_fs_t * req) {
+    HandleScope scope;
+
+    int argc = 1;
+    Local<Value> argv[2];
+    const Handle<Object> * cb = (Handle<Object> *) req->data;
+
+    if (req->result < 0) {
+        int code = uv_last_error(uv_default_loop()).code;
+        argv[0] = UVException(code, "some fs io", "", req->path);
+    } else {
+        argc = 2;
+        argv[0] = Local<Value>::New(Null());
+
+        switch (req->fs_type) {
+            case UV_FS_OPEN:
+                argv[1] = Integer::New(req->result);
+                break;
+            case UV_FS_READ:
+                argv[1] = Integer::New(req->result);
+                break;
+            default:
+                assert(0 && "Unhandled IO response");
+        }
+    }
+
+    MakeCallback(* cb, 0, argc, argv);
+
+    uv_fs_req_cleanup(req);
+
+    free(req);
 }
 
 NODE_MODULE(fs, Initialize)

@@ -24,13 +24,25 @@ class FSRequestWrap: public ReqWrap<uv_fs_t> {
 
 #define FS_SYNC_CALL(name, path, ...) \
     uv_fs_t * req = (uv_fs_t *) malloc(sizeof(uv_fs_t)); \
-    int result = uv_fs_##name(uv_default_loop(), req, __VA_ARGS__, NULL); \
-    if (result < 0) { \
+    int r = uv_fs_##name(uv_default_loop(), req, __VA_ARGS__, NULL); \
+    if (r < 0) { \
         int code = uv_last_error(uv_default_loop()).code; \
         return ThrowException(UVException(code, #name, "", path)); \
     }
 
-#define FS_SYNC_RESULT result
+#define FS_SYNC_RESULT r
+
+#define FS_ASYNC_CALL(name, cb, ...) \
+    uv_fs_t * req = (uv_fs_t *) malloc(sizeof(uv_fs_t)); \
+    req->data = (void *) cb; \
+    int r = uv_fs_##name(uv_default_loop(), req, __VA_ARGS__, After); \
+    if (r < 0) { \
+        req->result = r; \
+        req->path = NULL; \
+        req->errorno = uv_last_error(uv_default_loop()).code; \
+        After(req); \
+    } \
+    return scope.Close(cb);
 
 #define THROW_ERROR(message) \
     ThrowException(Exception::Error(String::New(message)));
@@ -38,8 +50,8 @@ class FSRequestWrap: public ReqWrap<uv_fs_t> {
 #define THROW_TYPE_ERROR(message) \
     ThrowException(Exception::TypeError(String::New(message)));
 
-Handle<Value> Open(const Arguments &args);
-Handle<Value> Read(const Arguments &args);
-Handle<Value> Close(const Arguments &args);
+static Handle<Value> Open(const Arguments &args);
+static Handle<Value> Read(const Arguments &args);
+static Handle<Value> Close(const Arguments &args);
 
 #endif
