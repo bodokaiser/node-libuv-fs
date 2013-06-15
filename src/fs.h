@@ -13,7 +13,6 @@ class FSRequestWrap: public ReqWrap<uv_fs_t> {
     public:
         FSRequestWrap(const char * syscall)
             : syscall_(syscall) {
-
         }
 
         const char * syscall() {
@@ -23,10 +22,10 @@ class FSRequestWrap: public ReqWrap<uv_fs_t> {
         const char * syscall_;
 };
 
-#define FS_THROW_ERROR(message) \
+#define THROW_ERROR(message) \
     ThrowException(Exception::Error(String::New(message)));
 
-#define FS_THROW_TYPE_ERROR(message) \
+#define THROW_TYPE_ERROR(message) \
     ThrowException(Exception::TypeError(String::New(message)));
 
 static void After(uv_fs_t * req);

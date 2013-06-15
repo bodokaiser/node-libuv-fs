@@ -20,11 +20,34 @@ If you have done this you should be able to access most common apis through the
 In the following I will list a small api documentation about the supported 
 bindings.
 
-### fs.open(path)
+### fs.open(path, flags, mode)
 
-    var fd = fs.open('test.tmp');
+    var fd = fs.open('./README.md', 0, 0777);
     // outputs file descriptor to console
     console.log(fd);
+
+### fs.open(path, flags, mode, cb)
+
+    fs.open('./README.md', 0, 0777, function(err, fd) {
+        if (err) throw err;
+        console.log(fd);    
+    });
+
+### fs.read(path, buffer, offset, length, position, [callback])
+
+    fs.open('./README.md', 0, 0777, function(err, fd) {
+        var buf = new Buffer(1024);
+        
+        fs.read(fd, buf, 0, 1024, -1, function(err, read) {
+            console.log(buf);
+        })
+    });
+
+### fs.close(fd, [callback])
+
+    fs.open('./README.md', 0, 0777, function(err, fd) {
+        fs.close(fd);
+    });
 
 ## License
 

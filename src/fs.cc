@@ -19,18 +19,18 @@ Initialize(Handle<Object> exports) {
             FunctionTemplate::New(Close)->GetFunction());
 }
 
-static Persistent<String> oncomplete_symbol;
+static Persistent<String> oncomplete_symbol = NODE_PSYMBOL("oncomplete");
 
 static Handle<Value>
 Open(const Arguments &args) {
     HandleScope scope;
 
     if (!args[0]->IsString())
-        return FS_THROW_TYPE_ERROR("Path must be a string.");
+        return THROW_TYPE_ERROR("Path must be a string.");
     if (!args[1]->IsInt32())
-        return FS_THROW_TYPE_ERROR("Flags must be an integer.");
+        return THROW_TYPE_ERROR("Flags must be an integer.");
     if (!args[2]->IsInt32())
-        return FS_THROW_TYPE_ERROR("Mode must be an integer.");
+        return THROW_TYPE_ERROR("Mode must be an integer.");
 
     String::AsciiValue path(args[0]);
     int flags = args[1]->Int32Value();
@@ -49,15 +49,15 @@ Read(const Arguments &args) {
     HandleScope scope;
 
     if (!args[0]->IsInt32())
-        return FS_THROW_TYPE_ERROR("File descriptor must be an integer.");
+        return THROW_TYPE_ERROR("File descriptor must be an integer.");
     if (!Buffer::HasInstance(args[1]))
-        return FS_THROW_TYPE_ERROR("Buffer must be a buffer.");
+        return THROW_TYPE_ERROR("Buffer must be a buffer.");
     if (!args[2]->IsInt32())
-        return FS_THROW_TYPE_ERROR("Offset must be an integer.");
+        return THROW_TYPE_ERROR("Offset must be an integer.");
     if (!args[3]->IsInt32())
-        return FS_THROW_TYPE_ERROR("Length must be an integer.");
+        return THROW_TYPE_ERROR("Length must be an integer.");
     if (!args[4]->IsInt32())
-        return FS_THROW_TYPE_ERROR("Position must be an integer.");
+        return THROW_TYPE_ERROR("Position must be an integer.");
 
     int fd = args[0]->Int32Value();
     
@@ -69,9 +69,9 @@ Read(const Arguments &args) {
     int64_t pos = args[4]->NumberValue();
     
     if (off > buf_len)
-        return FS_THROW_ERROR("Offset is out of buffer range.");
+        return THROW_ERROR("Offset is out of buffer range.");
     if (off + len > buf_len)
-        return FS_THROW_ERROR("Length is out of buffer range.");
+        return THROW_ERROR("Length is out of buffer range.");
 
     if (args[5]->IsFunction()) {
         FS_ASYNC_CALL(read, args[5], fd, buf_data + off, len, pos);
@@ -86,7 +86,7 @@ Close(const Arguments &args) {
     HandleScope scope;
 
     if (!args[0]->IsNumber())
-        return FS_THROW_TYPE_ERROR("First Argument must be a number.");
+        return THROW_TYPE_ERROR("First Argument must be a number.");
 
     int fd = args[0]->NumberValue();
 
@@ -130,9 +130,6 @@ After(uv_fs_t * req) {
                 assert(0 && "Unhandled IO response");
         }
     }
-
-    if (oncomplete_symbol.IsEmpty())
-        oncomplete_symbol = NODE_PSYMBOL("oncomplete");
 
     MakeCallback(req_wrap->object_, oncomplete_symbol, argc, argv);
 

@@ -6,28 +6,25 @@ describe('fs', function() {
 
     describe('#open', function() {
 
-        it('should throw an error if file not existent', function() {
+        it('should throw an error if file not existent', function(done) {
             chai.expect(function() {
                 fs.open('blabla', 0, 0777);
             }).to.throw(Error);
 
-            /*
             fs.open('balbal', 0, 0777, function(err) {
                 chai.expect(err).to.be.an.instanceof(Error);
+                done();
             });
-            */
         });
 
         it('should return a file descriptor', function() {
             chai.expect(fs.open('./README.md', 0, 0777))
                 .to.be.a('number');
 
-            /*
             fs.open('./README.md', 0, 0777, function(err, fd) {
                 chai.expect(fd).to.be.a('number');
                 fs.close(fd);
             });
-            */
         });
 
     });
@@ -88,12 +85,10 @@ describe('fs', function() {
 
         it('should read the first symbol of README.md', function() {
             var buf = new Buffer(15);
-            /*
             fs.read(fd, buf, 0, 15, -1, function(err, read) {
                 chai.expect(buf.toString())
                     .to.equal('# node-libuv-fs');
             });
-            */
         });
 
     });
