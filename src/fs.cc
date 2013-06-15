@@ -10,6 +10,14 @@ Handle<Value> OpenSync(const Arguments &args);
 Handle<Value> ReadSync(const Arguments &args);
 Handle<Value> CloseSync(const Arguments &args);
 
+#define THROW_ERROR(message) \
+    ThrowException(Exception::Error(String::New(message))); \
+    return scope.Close(Undefined());
+
+#define THROW_TYPE_ERROR(message) \
+    ThrowException(Exception::Error(String::New(message))); \
+    return scope.Close(Undefined());
+
 void
 Initialize(Handle<Object> exports) {
     exports->Set(String::NewSymbol("O_CREAT"), Integer::New(O_CREAT));
