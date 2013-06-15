@@ -7,7 +7,8 @@ Release/obj.target/fs/src/fs.o: ../src/fs.cc \
   /Users/bodo/.node-gyp/0.10.10/deps/uv/include/uv-private/uv-unix.h \
   /Users/bodo/.node-gyp/0.10.10/deps/uv/include/uv-private/ngx-queue.h \
   /Users/bodo/.node-gyp/0.10.10/deps/uv/include/uv-private/uv-darwin.h \
-  /Users/bodo/.node-gyp/0.10.10/src/node_object_wrap.h
+  /Users/bodo/.node-gyp/0.10.10/src/node_object_wrap.h \
+  /Users/bodo/.node-gyp/0.10.10/src/node_buffer.h
 ../src/fs.cc:
 /Users/bodo/.node-gyp/0.10.10/deps/v8/include/v8.h:
 /Users/bodo/.node-gyp/0.10.10/deps/v8/include/v8stdint.h:
@@ -17,3 +18,4 @@ Release/obj.target/fs/src/fs.o: ../src/fs.cc \
 /Users/bodo/.node-gyp/0.10.10/deps/uv/include/uv-private/ngx-queue.h:
 /Users/bodo/.node-gyp/0.10.10/deps/uv/include/uv-private/uv-darwin.h:
 /Users/bodo/.node-gyp/0.10.10/src/node_object_wrap.h:
+/Users/bodo/.node-gyp/0.10.10/src/node_buffer.h:

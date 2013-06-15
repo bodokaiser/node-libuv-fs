@@ -21,6 +21,66 @@ describe('fs', function() {
 
     describe('#readSync', function() {
 
+        var fd;
+
+        beforeEach(function() {
+            fd = fs.openSync('./README.md', fs.O_RDONLY, 0777);
+        });
+
+        afterEach(function() {
+            fs.closeSync(fd);
+        });
+
+        it('should throw an error on wrong fd', function() {
+            chai.expect(function() {
+                fs.readSync('', new Buffer(1), 0, 1, -1);
+            }).to.throw(TypeError);
+        });
+
+        it('should throw an error on wrong buf', function() {
+            chai.expect(function() {
+                fs.readSync(fd, 33, 0, 1, -1);
+            }).to.throw(TypeError);
+        });
+
+        it('should throw an error on wrong buf offset', function() {
+            chai.expect(function() {
+                fs.readSync(fd, new Buffer(1), {}, 1, -1);
+            }).to.throw(TypeError);
+        });
+           
+        it('should throw an error on wrong read length', function() {
+            chai.expect(function() {
+                fs.readSync(fd, new Buffer(1), 0, [], -1);
+            }).to.throw(TypeError);
+        });
+
+        it('should throw an error on wrong read position', function() {
+            chai.expect(function() {
+                fs.readSync(fd, new Buffer(1), 0, 1, function() {});
+            }).to.throw(TypeError);
+        });
+
+        it('should throw error if offset exceeds buffer length', function() {
+            chai.expect(function() {
+                fs.readSync(fd, new Buffer(1), 5, 1, -1);
+            }).to.throw(Error);
+        });
+
+        it('should throw error if offset and length exceeds buffer', function() {
+            chai.expect(function() {
+                fs.readSync(fd, new Buffer(1), 1, 1, -1);
+            }).to.throw(Error);
+        });
+
+        it('should read the first symbol of README.md', function() {
+            var buf = new Buffer(15);
+
+            fs.readSync(fd, buf, 0, 15, -1);
+
+            chai.expect(buf.toString()).to.equal('# node-libuv-fs');
+        });
+
     });
 
     describe('#closeSync', function() {

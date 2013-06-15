@@ -1,7 +1,10 @@
 #include "v8.h"
 #include "node.h"
+#include "node_buffer.h"
 
 using namespace v8;
+
+using node::Buffer;
 
 Handle<Value> OpenSync(const Arguments &args);
 Handle<Value> ReadSync(const Arguments &args);
@@ -70,14 +73,81 @@ Handle<Value>
 ReadSync(const Arguments &args) {
     HandleScope scope;
 
-    if (!args[0]->IsNumber()) {
+    if (!args[0]->IsInt32()) {
         ThrowException(Exception::TypeError(
                     String::New("First argument must be fd.")));
 
         return scope.Close(Undefined());
     }
 
-    return scope.Close(Undefined());
+    if (!Buffer::HasInstance(args[1])) {
+        ThrowException(Exception::TypeError(
+                    String::New("Second argument must be a buffer.")));
+
+        return scope.Close(Undefined());
+    }
+
+    if (!args[2]->IsInt32()) {
+        ThrowException(Exception::TypeError(
+                    String::New("Third argument must be the offset.")));
+
+        return scope.Close(Undefined());
+    }
+
+    if (!args[3]->IsInt32()) {
+        ThrowException(Exception::TypeError(
+                    String::New("Fourth argument must be the length.")));
+
+        return scope.Close(Undefined());
+    }
+
+    if (!args[4]->IsInt32()) {
+        ThrowException(Exception::TypeError(
+                    String::New("Fift argument must be the position.")));
+
+        return scope.Close(Undefined());
+    }
+
+    int fd = args[0]->Int32Value();
+
+    Local<Object> buffer = args[1]->ToObject();
+    char * buffer_ptr = NULL;
+    char * buffer_data = Buffer::Data(buffer);
+    size_t buffer_length = Buffer::Length(buffer);
+
+    size_t offset = args[2]->Int32Value();
+    if (offset > buffer_length) {
+        ThrowException(Exception::Error(
+                    String::New("Offset is out of buffer range.")));
+
+        return scope.Close(Undefined());
+    }
+
+    size_t length = args[3]->Int32Value();
+    if (offset + length > buffer_length) {
+        ThrowException(Exception::Error(
+                    String::New("Length is out of buffer range.")));
+
+        return scope.Close(Undefined());
+    }
+
+    int64_t position = args[4]->NumberValue();
+
+    buffer_ptr = buffer_data + offset;
+
+    uv_fs_t * req = (uv_fs_t *) malloc(sizeof(uv_fs_t));
+
+    int read = uv_fs_read(uv_default_loop(), req, fd, buffer_ptr, 
+            length, position, NULL);
+
+    if (read < 0) {
+        ThrowException(Exception::Error(
+                    String::New("Error on reading file.")));
+
+        return scope.Close(Undefined());
+    }
+
+    return scope.Close(Integer::New(read));
 }
 
 Handle<Value>
