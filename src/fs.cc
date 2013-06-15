@@ -9,6 +9,11 @@ Handle<Value> CloseSync(const Arguments &args);
 
 void
 Initialize(Handle<Object> exports) {
+    exports->Set(String::NewSymbol("O_CREAT"), Integer::New(O_CREAT));
+    exports->Set(String::NewSymbol("O_RDONLY"), Integer::New(O_RDONLY));
+    exports->Set(String::NewSymbol("O_WRONLY"), Integer::New(O_WRONLY));
+    exports->Set(String::NewSymbol("O_RDWR"), Integer::New(O_RDWR));
+    
     exports->Set(String::NewSymbol("openSync"), 
             FunctionTemplate::New(OpenSync)->GetFunction());
     exports->Set(String::NewSymbol("readSync"),
@@ -28,12 +33,28 @@ OpenSync(const Arguments &args) {
         return scope.Close(Undefined());
     }
 
+    if (!args[1]->IsInt32()) {
+        ThrowException(Exception::TypeError(
+                    String::New("Second argument must be an integer.")));
+
+        return scope.Close(Undefined());
+    }
+
+    if (!args[2]->IsInt32()) {
+        ThrowException(Exception::TypeError(
+                    String::New("Third argument must be an integer.")));
+
+        return scope.Close(Undefined());
+    }
+
     String::AsciiValue path(args[0]);
+    int flags = args[1]->Int32Value();
+    int mode = static_cast<int>(args[2]->Int32Value());
 
     uv_fs_t * request = (uv_fs_t*) malloc(sizeof(uv_fs_t));
     
     int fd = uv_fs_open(uv_default_loop(), request, * path, 
-            O_RDWR, S_IRUSR, NULL);
+            flags, mode, NULL);
 
     if (fd < 0) {
         ThrowException(Exception::Error(
