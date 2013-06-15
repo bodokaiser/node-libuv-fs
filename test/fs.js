@@ -4,37 +4,37 @@ describe('fs', function() {
 
     var fs = require('../build/Release/fs');
 
-    describe('#open', function() {
+    describe('#openSync', function() {
 
         it('should throw an error if file not existent', function() {
             chai.expect(function() {
-                fs.open('blabla');
+                fs.openSync('blabla');
             }).to.throw(Error);
         });
 
         it('should return a file descriptor', function() {
-            chai.expect(fs.open('./README.md')).to.be.a('number');
+            chai.expect(fs.openSync('./README.md')).to.be.a('number');
         });
 
     });
 
-    describe('#read', function() {
+    describe('#readSync', function() {
 
     });
 
-    describe('#close', function() {
+    describe('#closeSync', function() {
 
         it('should throw an error if first argument not a number', function() {
             chai.expect(function() {
-                fs.close('blabla');
+                fs.closeSync('blabla');
             }).to.throw(TypeError);
         });
 
         it('should close a file', function() {
-            var fd = fs.open('./README.md');
+            var fd = fs.openSync('./README.md');
 
             chai.expect(function() {
-                fs.close(fd);
+                fs.closeSync(fd);
             }).to.not.throw(Error);
         });
 

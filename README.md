@@ -20,11 +20,11 @@ If you have done this you should be able to access most common apis through the
 In the following I will list a small api documentation about the supported 
 bindings.
 
-### fs.read(path)
+### fs.openSync(path)
 
-    var file = fs.read('test.tmp');
-    // outputs file to console
-    console.log(file);
+    var fd = fs.openSync('test.tmp');
+    // outputs file descriptor to console
+    console.log(fd);
 
 ## License
 

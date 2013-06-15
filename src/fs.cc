@@ -3,24 +3,27 @@
 
 using namespace v8;
 
-Handle<Value> Open(const Arguments &args);
-Handle<Value> Close(const Arguments &args);
+Handle<Value> OpenSync(const Arguments &args);
+Handle<Value> ReadSync(const Arguments &args);
+Handle<Value> CloseSync(const Arguments &args);
 
 void
 Initialize(Handle<Object> exports) {
-    exports->Set(String::NewSymbol("open"), 
-            FunctionTemplate::New(Open)->GetFunction());
-    exports->Set(String::NewSymbol("close"), 
-            FunctionTemplate::New(Close)->GetFunction());
+    exports->Set(String::NewSymbol("openSync"), 
+            FunctionTemplate::New(OpenSync)->GetFunction());
+    exports->Set(String::NewSymbol("readSync"),
+            FunctionTemplate::New(ReadSync)->GetFunction());
+    exports->Set(String::NewSymbol("closeSync"), 
+            FunctionTemplate::New(CloseSync)->GetFunction());
 }
 
 Handle<Value>
-Open(const Arguments &args) {
+OpenSync(const Arguments &args) {
     HandleScope scope;
 
     if (!args[0]->IsString()) {
         ThrowException(Exception::TypeError(
-                    String::New("First Argument must be a string.")));
+                    String::New("First argument must be a string.")));
 
         return scope.Close(Undefined());
     }
@@ -43,7 +46,21 @@ Open(const Arguments &args) {
 }
 
 Handle<Value>
-Close(const Arguments &args) {
+ReadSync(const Arguments &args) {
+    HandleScope scope;
+
+    if (!args[0]->IsNumber()) {
+        ThrowException(Exception::TypeError(
+                    String::New("First argument must be fd.")));
+
+        return scope.Close(Undefined());
+    }
+
+    return scope.Close(Undefined());
+}
+
+Handle<Value>
+CloseSync(const Arguments &args) {
     HandleScope scope;
 
     if (!args[0]->IsNumber()) {
