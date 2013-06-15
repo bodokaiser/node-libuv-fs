@@ -30,6 +30,8 @@ class FSRequestWrap: public ReqWrap<uv_fs_t> {
         return ThrowException(UVException(code, #name, "", path)); \
     }
 
+#define FS_SYNC_RESULT result
+
 #define THROW_ERROR(message) \
     ThrowException(Exception::Error(String::New(message)));
 

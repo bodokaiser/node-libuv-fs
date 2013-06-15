@@ -6,6 +6,7 @@
 using namespace v8;
 
 using node::Buffer;
+using node::UVException;
 
 void
 Initialize(Handle<Object> exports) {
@@ -32,14 +33,9 @@ Open(const Arguments &args) {
     int flags = args[1]->Int32Value();
     int mode = static_cast<int>(args[2]->Int32Value());
 
-    uv_fs_t * request = (uv_fs_t*) malloc(sizeof(uv_fs_t));
-    
-    int fd = uv_fs_open(uv_default_loop(), request, * path, 
-            flags, mode, NULL);
+    FS_SYNC_CALL(open, * path, * path, flags, mode);
 
-    if (fd < 0) return THROW_ERROR("Error opening file.");
-
-    return scope.Close(Integer::New(fd));
+    return scope.Close(Integer::New(FS_SYNC_RESULT));
 }
 
 Handle<Value>
@@ -58,29 +54,22 @@ Read(const Arguments &args) {
         return THROW_TYPE_ERROR("Position must be an integer.");
 
     int fd = args[0]->Int32Value();
-
-    char * buffer_ptr = NULL;
-    char * buffer_data = Buffer::Data(args[1]->ToObject());
-    size_t buffer_length = Buffer::Length(args[1]->ToObject());
-    size_t offset = args[2]->Int32Value();
-    size_t length = args[3]->Int32Value();
-    int64_t position = args[4]->NumberValue();
     
-    if (offset > buffer_length)
+    char * buf_data = Buffer::Data(args[1]->ToObject());
+    size_t buf_len = Buffer::Length(args[1]->ToObject());
+    
+    size_t off = args[2]->Int32Value();
+    size_t len = args[3]->Int32Value();
+    int64_t pos = args[4]->NumberValue();
+    
+    if (off > buf_len)
         return THROW_ERROR("Offset is out of buffer range.");
-    if (offset + length > buffer_length)
+    if (off + len > buf_len)
         return THROW_ERROR("Length is out of buffer range.");
 
-    buffer_ptr = buffer_data + offset;
+    FS_SYNC_CALL(read, 0, fd, buf_data + off, len, pos);
 
-    uv_fs_t * req = (uv_fs_t *) malloc(sizeof(uv_fs_t));
-
-    int read = uv_fs_read(uv_default_loop(), req, fd, buffer_ptr, 
-            length, position, NULL);
-
-    if (read < 0) return THROW_ERROR("Error on reading file.");
-
-    return scope.Close(Integer::New(read));
+    return scope.Close(Integer::New(FS_SYNC_RESULT));
 }
 
 Handle<Value>
@@ -92,11 +81,7 @@ Close(const Arguments &args) {
 
     int fd = args[0]->NumberValue();
 
-    uv_fs_t * req = (uv_fs_t *) malloc(sizeof(uv_fs_t));
-
-    int r = uv_fs_close(uv_default_loop(), req, fd, NULL);
-
-    if (r < 0) return THROW_ERROR("Error closing file.");
+    FS_SYNC_CALL(close, 0, fd);
 
     return scope.Close(Undefined());
 }
