@@ -9,21 +9,16 @@ using node::Buffer;
 
 void
 Initialize(Handle<Object> exports) {
-    exports->Set(String::NewSymbol("O_CREAT"), Integer::New(O_CREAT));
-    exports->Set(String::NewSymbol("O_RDONLY"), Integer::New(O_RDONLY));
-    exports->Set(String::NewSymbol("O_WRONLY"), Integer::New(O_WRONLY));
-    exports->Set(String::NewSymbol("O_RDWR"), Integer::New(O_RDWR));
-    
-    exports->Set(String::NewSymbol("openSync"), 
-            FunctionTemplate::New(OpenSync)->GetFunction());
-    exports->Set(String::NewSymbol("readSync"),
-            FunctionTemplate::New(ReadSync)->GetFunction());
-    exports->Set(String::NewSymbol("closeSync"), 
-            FunctionTemplate::New(CloseSync)->GetFunction());
+    exports->Set(String::NewSymbol("open"), 
+            FunctionTemplate::New(Open)->GetFunction());
+    exports->Set(String::NewSymbol("read"),
+            FunctionTemplate::New(Read)->GetFunction());
+    exports->Set(String::NewSymbol("close"), 
+            FunctionTemplate::New(Close)->GetFunction());
 }
 
 Handle<Value>
-OpenSync(const Arguments &args) {
+Open(const Arguments &args) {
     HandleScope scope;
 
     if (!args[0]->IsString())
@@ -48,7 +43,7 @@ OpenSync(const Arguments &args) {
 }
 
 Handle<Value>
-ReadSync(const Arguments &args) {
+Read(const Arguments &args) {
     HandleScope scope;
 
     if (!args[0]->IsInt32())
@@ -89,7 +84,7 @@ ReadSync(const Arguments &args) {
 }
 
 Handle<Value>
-CloseSync(const Arguments &args) {
+Close(const Arguments &args) {
     HandleScope scope;
 
     if (!args[0]->IsNumber())

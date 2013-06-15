@@ -20,9 +20,9 @@ If you have done this you should be able to access most common apis through the
 In the following I will list a small api documentation about the supported 
 bindings.
 
-### fs.openSync(path)
+### fs.open(path)
 
-    var fd = fs.openSync('test.tmp');
+    var fd = fs.open('test.tmp');
     // outputs file descriptor to console
     console.log(fd);
 

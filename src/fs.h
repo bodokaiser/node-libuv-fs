@@ -36,8 +36,8 @@ class FSRequestWrap: public ReqWrap<uv_fs_t> {
 #define THROW_TYPE_ERROR(message) \
     ThrowException(Exception::TypeError(String::New(message)));
 
-Handle<Value> OpenSync(const Arguments &args);
-Handle<Value> ReadSync(const Arguments &args);
-Handle<Value> CloseSync(const Arguments &args);
+Handle<Value> Open(const Arguments &args);
+Handle<Value> Read(const Arguments &args);
+Handle<Value> Close(const Arguments &args);
 
 #endif
