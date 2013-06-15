@@ -21,7 +21,7 @@
 
     "scripts": {
         "test": "make test",
-        "install": "make install"
+        "prepublish": "make build"
     },
 
     "repository": {

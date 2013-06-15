@@ -15,21 +15,16 @@ If you have done this you should be able to access most common apis through the
 
     var fs = require('libuv-fs');
 
-    fs.open('test.temp', function() {
-
-    });
-
 ## Documentation
 
 In the following I will list a small api documentation about the supported 
 bindings.
 
-### fs.read(path, callback)
+### fs.read(path)
 
-    fs.read('test.tmp', function(file) {
-        // outputs file content to console
-        console.log(file);
-    });
+    var file = fs.read('test.tmp');
+    // outputs file to console
+    console.log(file);
 
 ## License
 
